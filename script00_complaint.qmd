@@ -1,0 +1,634 @@
+---
+title: "Injustice, émotions et actions de justice"
+author: "Christophe Benavent"
+date: "10 janvier 2023"
+date-format: long
+institute: "Université Dauphine-PSL - M&O - Acss"
+pdf-engine:latex: xelatex
+format: 
+  beamer:
+    toc: true
+    toc-depth : 3
+    toc-title	: "Sommaire"
+    colorlinks: true
+    aspectratio: 54
+    theme: Boadilla
+    fonttheme: serif
+fontsize: 9pt
+slide-level: 2
+execute:
+  echo: true
+  include: true
+  warning: false
+  message: false
+
+bibliography: complaint.bib
+---
+
+```{r 00, echo=FALSE}
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  paste0("\n \\", "tiny","\n\n", x, "\n\n \\normalsize")
+})
+library(tidyverse)
+library(lubridate)
+library(zoo)
+library(scales)
+library(ggpubr) # régression in ggplot
+library(jtools)
+library(cowplot)
+library(DiagrammeR)
+library(udpipe)
+library(ggrepel)
+
+theme_set(theme_minimal())
+```
+
+## Contexte
+
+-   Contrat doctoral DITP
+-   Groupe de Travail Amarc
+-   Un vieux travail (2007) fait à la Dépêche du Midi.
+
+
+# Quelques éléments de théorie
+
+-   le modèle exit/voice/loyalty est fondamentale 
+-   Une littérature abondante dans les années 90
+-   Le rôle clé des émotions doit être précisé.
+-   Une économie de l'injustice se dessine avec la prise en compte de la vengeance.
+
+## Le modèle exit/voice/loyalty
+
+C'est sans doute le livre fondateur qui amène une idée simple et fondamentale : il n'y a pas qu'une réponse économique à l'insatisfaction, mais aussi une réponse apathique et mieux une réponse politique @hirschman_exit_1970
+
+-   Exit : la réponse concurrentielle. l'insatisfaction conduit les agents à renoncer à acheter, il sortent du marché.
+
+-   Loyalty : le statut quo. Dans une situation de monopole, même insatisfait on reste le client d'un système réprouvé
+
+-   Voice : l'interpellation. C'est la réponse politique qui commence par la lettre de réclamation, le SAV, peut passer par la médiation et se constituer en action organisée de pétitions, de boycott ou d'action en justice.
+
+La dimension réponse public/ privée est essentielle. (bonheur privé / action publique)
+
+## La riche littérature du customer complaint
+
+-   Années 80 : les première pierres sont posées : @oliver_consumer_1989
+-   Années 90 : le problème est exploré dans la dimension de la relation clients et du customer complaint @stephens_why_1998, @tax_customer_1998
+-   Années 00 : On développe sur différents cas d'espèces @maxham_firms_2003 @bell_when_2004
+-   Années 10 : explorer l'idée dans l'univers des consumer reviews en perdant de la théorie mais aussi @knox_customer_2014 ou les impacts sur les forces de ventes @tao_how_2016
+-   années 20 : revenir à expression des réclamations; le NLP s'attaque à un vieil objets et de nouvelles données
+
+## Le rôle des émotions :
+
+-   L'émotion comme prédisposition à l'action @stephens_why_1998
+
+![StephensGwinner98](StephensGwinner98.jpg){width="80%"}
+
+## la progressive découverte de la vengeance
+
+-   Oeil pour oeil, dent pour dent. Faire payer en proportion du dommage subit
+
+    -   Vol
+    -   Dénonciation
+    -   Dégradation des installations
+    -   Agression physique
+    -   Insultes
+    -   ...
+
+-   Quelques références @bennett_anger_1997 ou @gregoire_how_2018 et une littérature active.
+
+## Une économie de l'action de justice
+
+L'action est engagée en fonction d'une balance des espérance de gains et des pertes. Les gains représente la différence entre le dommage, ce que l'on croit avoir perdu) $p$ et l'espérance de la compensation $g=E(C)-c(C)$. Les pertes le coût du moyen d'action.
+
+-   si $g >> p$ : l'interpellation est possible, le mode de réclamation dépend de ses coûts.
+
+    -   privé : lettre de réclamation, appel au service client, médiation
+
+    -   publique : class-action, pétition,
+
+-   si $g=p$ : il y a indifférence on préférera ne rien faire. On reste loyal de manière fataliste. L'attribution de responsabilité est déterminante.
+
+-   si $g<p$ : on sort, on n'achète plus, on coupe la relation, c'est la voie du désengagement.
+
+-   si $g << p$ : la vengeance est le chemin
+
+    -   privée : sabotage, vol, dénonciation,
+
+    -   publique : boycott
+
+## Un modèle à transition de phase ?
+
+![Transition de phases](transition.jpg){width="70%"}
+
+# Un modèle assez général
+
+-   L'expérience vécue dans l'achat ou la consommation conduit à un double jugement : en terme d'attente, son résultat est la satisfaction, en terme de droits, son résultat est celui du sentiment d'injustice dont la conception est largement celle de @colquitt_justice_2001 et sa triple dimension : équité, régularité, et dignité, s'ajoute peut-être la transparence.
+
+-   L'émotion est activée par ce double jugement et prédispose à l'action. (la colère à se venger, la tristesse à s'éloigner, le dégoût à rejeter, l'inquiétude à s'immobiliser et à surveiller)
+
+-   L'action dépend de l'économie de la restauration. Une gamme d'actions est possible, faire un procès , insulter, protester, rayer de ses carnets. Chacune d'elles, de manière idiosyncratique, a une certaines probabilité d'être mise en oeuvre en fonction de l'effort qu'elles demandent $c_k$ de et de l'espérance de compensation $E_k(c_k)$ qu'elles produisent.
+
+## Schéma d'analyse
+
+![Actions de justice](ModeleActionjustice.png){width="70%"}
+
+```{r 02, echo=FALSE}
+DiagrammeR::mermaid("
+flowchart TB 
+  subgraph expérience
+  Expérience --> |Comparaison|Attentes
+  Expérience --> |Evaluation|Satisfaction
+  Expérience --> |Evaluation|Injustice
+  end
+  Attentes --> Satisfaction
+  subgraph Formes d'injustice
+  Injustice--> |mode|Distributionnelle
+  Injustice-->|mode|Procédurale
+  Injustice-->|mode|Interactionnelle
+  end
+  Satisfaction-->Injustice
+  Satisfaction-->Emotions
+  Injustice-->Emotions
+  Injustice-->Restauration
+  Satisfaction-->Restauration
+  Emotions-->Restauration
+  subgraph restauration
+  Restauration--> |mode|Exit
+  Restauration-->|mode|Vengeance 
+  Restauration-->|mode|Protestation
+  Restauration-->|mode|Réparation 
+  Restauration--> |mode|Loyalty
+  end  ")
+```
+
+# Méthode : travailler à partir du texte des réclamations
+
+-   Des échelles de mesures, puis un peu de mesure comportementale.
+
+-   Le texte permet d'accéder à comment les réclamants pensent et expriment leur sentiment d'insatisfaction et d'injustice. La riche littérature sur les avis ouvre des voies.
+
+-   On se focalise sur la zone du private voice, on ne capte qu'une partie de la réponse, mais des intentions se manifestent et des sentiments s'expriment
+
+## Processus d'analyse
+
+-   tout est réalisé en r avec quarto/beamer. (y compris cette présentation)
+
+-   Le processus de traitement des données suit le pipe suivant :
+
+![Pipe de traitement](pipe.jpg){width="80%"}
+
+```{r 03, echo=FALSE}
+
+DiagrammeR::mermaid("
+flowchart LR
+  subgraph Annotations
+    data --> |udpipe|Tokens
+    Feel --> |join|Tokens
+  end
+  subgraph Wordclouds
+  Tokens --> |Filtrage Upos|wordclouds
+  end 
+  subgraph Embeddings
+  Tokens --> |Filtrage Upos|Word2vec
+  Word2vec --> |synonymes|Tsne+clustering
+  Word2vec --> |synonymes|Doc2Vec
+  Doc2Vec --> |similarity|Justice
+  end
+    data-->Transformers
+    Justice--> |correlation |Correlation 
+   subgraph Sentiments
+    Transformers--> Sentiment
+   end
+    Sentiment--> Correlation")
+```
+
+## Les données
+
+-   La source : [DITP - services Publics+](https://www.plus.transformation.gouv.fr/experiences)
+-   Acquisition par scrapping : un merci à Bruno Chavez !
+
+![Avis Usager](experience1.jpg){width="40%"} ![Réponse administration](experience2.jpg){width="40%"}
+
+------------------------------------------------------------------------
+
+-   Distribution des avis
+
+```{r 04, echo=FALSE}
+df <- read_csv("./Data/data_original_12062022_normalise_sentiment_transformers_lemna_words_adj.csv")%>%
+  select (id, date_ecrit, titre, description, ressenti, pays,intitule, canaux_typologie_1, transformer_sentiment_score) 
+
+# install.packages("treemapify")
+library(treemapify)
+# install.packages("ggplot2")
+library(ggplot2)
+
+foo<-df %>% group_by(intitule)%>%summarise(n=n(), Sentiment=mean(transformer_sentiment_score, na.rm=TRUE))
+
+ggplot(foo, aes(area = n, fill = Sentiment, label=intitule)) +
+  geom_treemap(aes(label=intitule))+
+  scale_fill_gradientn(colours = hcl.colors(n=10, "Blue-Red 3",rev=TRUE)) +
+  geom_treemap_text(place = "centre", size = 10)+ 
+  labs(title = "Distribution des expériences",subtitle = "La surface est proportionnelle aux nombres d'avis" )
+```
+
+# Résultats
+
+-   L'ensemble du corpus par catégorie morphologique et sentiment des mots. 
+-   une approche vectorielle de l'injustice avec word2vec
+
+## Annotations syntaxique
+
+```{r 05, eval=FALSE, echo=FALSE}
+
+fr <- udpipe_download_model(language = "french")
+udmodel_french <- udpipe_load_model(file = "french-gsd-ud-2.5-191206.udpipe")
+
+UD <- udpipe_annotate(udmodel_french, x=df$description, trace =1000,parallel.cores = 4)
+UD <- as.data.frame(UD)
+
+saveRDS(UD, "./Data/UD.rds")
+
+```
+
+```{r 06, eval=TRUE, echo=FALSE}
+
+#creation de l'index
+index<-readRDS("./Data/UD.rds")%>%
+  group_by(doc_id)%>%
+  summarise(n_tok=n())%>%
+  mutate(doc_id2=as.numeric(str_remove(doc_id, "doc")))%>%arrange(doc_id2)
+
+index<-cbind(index,df) %>%mutate(n_word=str_count(description, "\\S+"))
+
+#ggplot(index,aes(x=n_word, y=n_tok))+geom_point()+scale_y_log10()+scale_x_log10()
+
+UD<-readRDS("./Data/UD.rds")%>%
+  select(doc_id,paragraph_id,sentence_id, token_id,lemma,upos)
+FEEL <- read_delim("FEEL.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)%>%
+  rename(lemma=word)
+
+UD1<-UD %>% 
+  left_join(FEEL) %>% 
+  select(doc_id,paragraph_id,sentence_id,token_id,7:14)%>%
+  replace(is.na(.), 0)%>%
+  mutate(polar=ifelse(polarity=="positive",1,ifelse(polarity=="negative",-1,0)))
+
+UD2<-UD %>%left_join(UD1)
+
+saveRDS(UD2, "./Data/UD2.rds")
+
+
+col=c("red","orange","yellow","lightgreen","green","skyblue","blue","purple")
+```
+
+```{r 07, echo=FALSE}
+UD2<-readRDS("./Data/UD2.rds")
+n_tok<-as.numeric(nrow(UD))
+
+UD2%>%
+  group_by(upos)%>%
+  summarise(n=n())%>%
+  ggplot(aes(x=reorder(upos,n), y=n))+
+  geom_bar(stat = "identity")+coord_flip()+ 
+  labs(title = paste0("Distribution des PoS - Nombre total de tokens : ",n_tok), 
+       x=NULL, y="Fréquence")+ scale_y_continuous(labels = scales::comma)
+
+```
+
+## Sentiment des mots
+
+On utilise le dictionnaire FEEL ( 14000 mots et expressions) de @mohammad_crowdsourcing_2013, il reprend les émotions de @ekman_argument_1992
+
+------------------------------------------------------------------------
+
+### Les noms communs
+
+-   Les noms communs désignent les choses, personnes, animaux et objets. Ils sont accompagnés d'un déterminant.
+
+```{r 08, echo=FALSE}
+library(ggwordcloud)
+df_noun<-UD2 %>%
+  filter(upos=="NOUN") %>%
+  group_by(lemma)%>%
+  summarise(n=n(),
+            sentiment=mean(polar)) %>%
+    arrange(desc(n))
+
+n_noun_type<-nrow(df_noun)
+n_noun_token<-sum(df_noun$n)
+
+f<-300
+df_noun %>% 
+  filter(n>f) %>%
+  ggplot(aes(label = lemma, size = sqrt(n))) +
+  geom_text_wordcloud_area(aes(color=sentiment)) +   
+  scale_size(range = c(1, 10))+
+  scale_color_gradient2(low = "orange", mid="grey",high = "skyblue")+
+  labs(title = "Distribution des noms communs",
+       subtitle = paste0("nombre de type : ",n_noun_type," - nombre de tokens : ",n_noun_token, " - Fréquence > ", f))
+
+```
+
+------------------------------------------------------------------------
+
+### Les noms propres
+
+-   Un nom propre désigne un individu (ou un groupe d'individus), un lieu ou une chose unique, contrairement au nom commun qui désigne des classes de personnes, de lieux, de choses ou d'abstractions. *La France, Paris, la Seine, les Parisiens, Edith Piaf* sont des noms propres. Ils prennent une majuscule.
+
+```{r 09, echo=FALSE}
+library(ggwordcloud)
+df_propn<-UD2 %>%
+  filter(upos=="PROPN") %>% mutate(x=str_extract(lemma, ".*\\’")) %>%
+  filter(is.na(x)) %>%
+  group_by(lemma)%>%
+  summarise(n=n(),
+            sentiment=mean(polar)) %>%
+    arrange(desc(n))
+
+n_propn_type<-nrow(df_propn)
+n_propn_token<-sum(df_propn$n)
+
+f<-50
+df_propn %>% 
+  filter(n>f) %>%
+  ggplot(aes(label = lemma, size = sqrt(n))) +
+  geom_text_wordcloud_area(aes(color=sentiment)) +   
+  scale_size(range = c(1, 10))+  
+  scale_color_gradient2(low = "orange", mid="grey",high = "skyblue")+
+  labs(title = "Distribution des noms propres",
+       subtitle = paste0("nombre de type : ",n_propn_type," - nombre de tokens : ",n_propn_token, " - Fréquence > ", f))
+
+
+```
+
+------------------------------------------------------------------------
+
+### Les adjectifs
+
+-   Un adjectif est un mot qui s'adjoint à un nom : pour le qualifier (c'est alors un adjectif qualificatif), pour le mettre en lien avec un autre élément (c'est alors un adjectif relationnel - *l'étoile polaire*), pour exprimer une place dans une série (c'est alors un adjectif numéral ordinal - *le second livre* ). Lorsque l'adjectif s'adjoint au nom, il est épithète, Lorsque l'adjectif est relié au nom par un verbe, on dit qu'il est attribut (*Ce livre est passionnant*)
+
+```{r 10, echo=FALSE}
+df_adj<-UD2 %>%
+  filter(upos=="ADJ") %>% #| upos=="ADV"
+  group_by(lemma)%>%
+  summarise(n=n(), sentiment=mean(polar)) %>%
+    arrange(desc(n))
+
+n_adj_type<-nrow(df_adj)
+n_adj_token<-sum(df_adj$n)
+f<- 150
+df_adj %>% 
+  filter(n>f) %>%
+  ggplot(aes(label = lemma, size = sqrt(n))) +
+  geom_text_wordcloud_area(aes(color=sentiment)) +   
+  scale_color_gradient2(low = "orange", mid="grey",high = "skyblue")+
+  labs(title = "Distribution des adjectifs",
+       subtitle = paste0("nombre de type : ",n_adj_type," - nombre de tokens : ",n_adj_token, " - Fréquence > ", f))
+
+```
+
+------------------------------------------------------------------------
+
+### Les verbes
+
+-   Un verbe est une Le verbe est une classe de mots variables. Il sert notamment à exprimer des actions, des états et des changements en les situant dans le temps (passé, présent ou futur). Lorsqu'il est conjugué à un mode personnel, le verbe est toujours le noyau d'un groupe verbal.
+
+```{r 11, echo=FALSE}
+df_verb<-UD2 %>%
+  filter(upos=="VERB" | upos=="AUX") %>% #| upos=="ADV"
+  group_by(lemma)%>%
+  summarise(n=n(),
+            sentiment=mean(polar)) %>%
+    arrange(desc(n))
+
+n_verb_type<-nrow(df_verb)
+n_verb_token<-sum(df_verb$n)
+f<- 300
+df_verb %>% 
+  filter(n>f & n<3000) %>%
+  ggplot(aes(label = lemma, size = sqrt(n))) +
+  geom_text_wordcloud_area(aes(color=sentiment)) +   
+  scale_size(range = c(1, 10))+  
+  scale_color_gradient2(low = "orange", mid="grey",high = "skyblue")+
+  labs(title = "Distribution des verbes",
+       subtitle = paste0("nombre de type : ",n_verb_type," - nombre de tokens : ",n_verb_token, " - Fréquence > ", f))
+
+```
+
+## Injustice : une approche par la vectorisation du corpus
+
+L'idée générale est de vectoriser le corpus, puis dans un second temps d'identifier les vecteurs représentation du sentiment d'injustice en recherchant les vecteurs les plus similaires à ceux de termes comme "injustice" de manière itérative.
+
+Le but est d'identifier des formes caractéristiques.
+![vector space](vectorspace.jpg){width=70%}
+
+------------------------------------------------------------------------
+
+### vectorisation du corpus
+
+```{r 12, echo=TRUE}
+library(word2vec)
+updated_vocab <- UD %>%  
+  filter(upos %in% c('NOUN', 'VERB', "ADJ", "ADV")) %>% 
+  mutate(lemma=tolower(lemma))
+
+updated_vocab2<- updated_vocab %>%
+  group_by(lemma)%>%
+  summarise(n=n())
+
+#on reconstitue le texte filtré
+text2<-updated_vocab %>%
+ group_by(doc_id) %>%
+ summarise(description = paste(lemma, collapse = " "))
+
+text2$clean<-txt_clean_word2vec(text2$description, ascii = TRUE, alpha = TRUE, tolower = TRUE, trim = TRUE)
+
+#on vectorise
+set.seed(123456789)
+model <- word2vec(x = text2$description, 
+                  type = "cbow", 
+                  window = 7, 
+                  dim = 200, 
+                  iter = 100,
+                  threads = 4L
+                  )
+embedding <- as.matrix(model)
+```
+
+------------------------------------------------------------------------
+
+### Exploration du vecteur de l'injustice
+
+```{r 13, echo=TRUE}
+y<-c("anormal","arbitraire","injuste", "injustifier", "inacceptable", "humiliant",
+                              "dommageable", "choquant", "inadmissible", "scandaleux", "discriminatoire")
+lookslike <- predict(model, y, type = "nearest", top_n = 100)
+
+n_vector<-as.numeric(length(y)) # 4
+
+res <- do.call(rbind.data.frame, lookslike) %>% 
+  select(-rank)%>%
+  pivot_wider(term1,names_from="term2", values_from = similarity)%>%
+  column_to_rownames(var="term1")%>%
+  t() %>% 
+  as.data.frame() %>%
+  rownames_to_column(var="word") %>%
+  rowwise() %>%
+  mutate(sum = sum(across(2:(1+n_vector)), na.rm = TRUE))%>%
+  replace(is.na(.),0)
+
+max<-min(res$sum)-0.05
+
+foo<-res %>% 
+  arrange(desc(sum)) %>% 
+  filter(sum>1.5)%>%
+  column_to_rownames(var="word")%>%
+  replace(.==0, max)%>%
+  select(-sum)
+
+#just to keep words aside
+word<-as.data.frame(rownames(foo))%>%
+  rename(word=1)
+
+head(foo, 5)
+```
+
+
+```{r 14, echo=FALSE, include=FALSE}
+
+library(Rtsne)
+set.seed(42) # Sets seed for reproducibility
+tsne_out <- Rtsne(foo,
+                  initial_dims = 10,
+                  perplexity = 7,
+                  partial_pca=TRUE,
+                  theta=.5,
+                  num_threads=4, 
+                  verbose=1)
+
+tsne_out1<-as.data.frame(tsne_out$Y)
+tsne_out2<-cbind(word,tsne_out1)
+
+```
+
+------------------------------------------------------------------------
+
+### Clustering
+
+```{r 15, echo=FALSE}
+
+d<-as.matrix(dist(tsne_out2[,2:3]))
+
+word<-as.vector(tsne_out2$word)
+rownames(d)<-word
+colnames(d)<-word
+
+hclust_avg <- hclust(as.dist(d), metho="complete")
+#plot(hclust_avg)
+library(ape)
+library("dendextend")
+dend = as.dendrogram(hclust_avg) 
+cols <- c("Salmon","brown", "black", "purple", "orange", "grey")
+cut_avg <- cutree(hclust_avg, h=heights_per_k.dendrogram(dend)["4"])
+
+plot(as.phylo(hclust_avg), type = "unrooted", tip.color=cols[cut_avg], cex=.5, lab4ut="axial")
+
+tsne_out2<-cbind(tsne_out2,cut_avg)
+```
+
+------------------------------------------------------------------------
+
+### Une représentation graphique
+
+Projection des vecteurs avec Tsne.
+
+
+```{r 16, echo=FALSE}
+set.seed(42)
+
+ggplot(tsne_out2, aes(x=V1, y=V2))+
+  geom_text_repel(aes(label=word, color=as.factor(cut_avg)),size=3, max.overlaps=50)+
+  theme(legend.position = "none")+
+  labs(x=NULL, y=NULL)+  
+  scale_size(range = c(.1, 3.5))+
+  geom_text(label= " Accidentel",x=0,y=2.5, color="salmon")+
+    geom_text(label= " Anormal",x=-7,y=0, color="black")+
+    geom_text(label= " Nuisance",x=7,y=-1.5, color="purple")+
+    geom_text(label= " Indigne",x=-2,y=-2, color="brown")+
+  scale_color_manual(values=cols)
+
+ggsave("vector.jpg", plot=last_plot(),width = 25, height = 20, units = "cm")
+```
+
+## Vectoriser les documents
+
+On vectorise les documents, l'ensemble des synonymes , puis calcule la distance du vecteur *Justice* à chacun des textes.
+
+```{r 17, echo=TRUE}
+
+x      <- data.frame(doc_id           = text2$doc_id, 
+                     text             = text2$description, 
+                     stringsAsFactors = FALSE)
+x$text <- txt_clean_word2vec(x$text, tolower=TRUE)
+
+emb_doc <- as.data.frame(doc2vec(model, x$text,  split = " ",type = "embedding"))
+
+emb_just <- as.data.frame(doc2vec(model,"anormal arbitraire injuste injustifier inacceptable humiliant  choquant inadmissible scandaleux discriminatoire",  split = " ",type = "embedding"))
+
+sim<-rbind(emb_doc,emb_just)%>%t()
+
+r<-as.data.frame(cor(sim[,1:16571],sim[,16572] ))%>%
+  rename(IndiceJ=1)
+```
+
+---
+
+### distribution de l'indice d'injustice. 
+
+```{r 17b, echo=FALSE}
+
+
+ggplot(r, aes(x=IndiceJ))+geom_density()
+
+```
+
+---
+
+### Corrélation avec le sentiment
+
+```{r 18, echo=FALSE}
+
+foo<-text2 %>% 
+  mutate(doc_id2=as.numeric(str_remove(doc_id, "doc")))%>%
+  cbind(emb_doc,r)
+
+foo1<- merge(foo,index, by="doc_id2")
+
+foo1<-foo1%>%drop_na()
+r <-cor.test(foo1$transformer_sentiment_score,foo1$IndiceJ)
+
+ggplot(foo1, aes(x=transformer_sentiment_score, y=IndiceJ))+
+  geom_smooth()+
+  labs(title="Relation entre sentiment positif (transformer) et injustice",
+       subtitle = paste0("r : ", round(r$estimate,3), "   t : ", round(r$statistic,2)),
+       x="Probabilité que le commentaire soit positif",
+       y="Indice d'injustice")
+
+```
+
+
+
+# Conclusions
+
+-   Un enjeu métrologique : comment mesurer dans le texte des concepts abstraits. Quelles approches ? Embeddings ou bientôt zero-shot classification, ? Pré-entrainement ou vectorisation interne au corpus ?
+
+-   Les réclamations : un seul mode de comportement observable :  ceux qui réclament. Et ceux qui ne réclament pas ? Un processus bayésien ?
+
+-   Un enjeu pratique : si l'écoute de la réclamation est un moyen de palier à l'insuffisance du marché, comment induire à partir de ce qui est observé ce qui est en état de nature ?
+
+
+
+# Références

@@ -1,0 +1,99 @@
+---
+title: "Injustice, émotions et action de justice"
+author: "Christophe Benavent"
+institute: "Université Paris Dauphine - PSL / Acss"
+pdf-engine:latex: xelatex
+format: 
+  beamer:
+    toc: true
+    colorlinks: true
+    aspectratio: 43
+    theme: Boadilla
+    fonttheme: serif
+    slide-level: 2
+fontsize: 8pt
+execute:
+  echo: true
+  include: true
+  warning: false
+  message: false
+
+bibliography: complaint.bib
+---
+
+```{r 00, echo=FALSE}
+
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  paste0("\n \\", "tiny","\n\n", x, "\n\n \\normalsize")
+})
+library(tidyverse)
+library(lubridate)
+library(zoo)
+library(scales)
+library(ggpubr) # régression in ggplot
+library(jtools)
+library(cowplot)
+library(DiagrammeR)
+theme_set(theme_minimal())
+
+```
+
+# Quelques éléments de théorie
+
+
+## Le modèle classique de l'injustice
+
+## Une riche littérature du customer complaint
+
+
+
+# Le modèle et les hypothèses
+
+
+```{r 01, echo=FALSE, fig.height=12}
+
+grViz("
+digraph boxes_and_circles {
+
+  # a 'graph' statement
+  graph [overlap = true, fontsize = 8]
+
+  # several 'node' statements
+  node [shape = box,
+        fontname = Helvetica]
+Satisfaction,Injustice, Restauration, Emotions, Distributionnelle, Procédurale, Interactionnelle
+
+    # several 'edge' statements
+ Injustice->Restauration Emotions-> Restauration Injustice->Emotions
+ Restauration->Reparation  Restauration->Vengeance 
+ Satisfaction-> Injustice Satisfaction ->Emotions
+ Injustice->Distributionnelle Injustice->Procédurale Injustice->Interactionnelle
+ subgraph {
+rank = same; Satisfaction; Injustice
+ }
+ subgraph {
+rank = same; Distributionnelle; Procédurale,Interactionnelle
+}
+
+}"
+)
+
+```
+
+##
+
+
+
+
+# Conclusions
+
+-   Un modèle fonctionnel qui mérite des adaptations pour chaque application. Dans notre cas un facteur essetntiel est celui de désabonnements, la limite est de ne pas tenir compte des utilisateurs actifs.  Il faudrait, pourvu que les données soient disponibles d'aller vers des Modèles SIR dans la mesure ou à l'adoption du réseau, il faut tenir compte de ceux qui s'en détachent. ( ou modèles à compartiments)
+
+-   Pas réellement un modèle de prédiction, mais un modèle qui rend compte de l'évolution si aucun facteur environnementaux ne varie. En estimant le potentiel sur la première partie de la série on arrive à une prédiction de l'ordre de 600 millions d'abonnés. La réalisation est de 800, le potentiel a-t-il changé ? Par la structure de la population ou l'offre de valeur ?
+
+-   Vers la saturation pour Linked In ? Près d'un milliard d'humains représente un humain sur 8, une précision à 1.2 milliards. Mais quel est le potentiel véritable? en fonction de quoi varie-t-il ? De la démographie ? De la structure du marché de l'emploi ?  De la professionnalisation de l'enseignement supérieur dans le monde? 
+
+
+# Références
